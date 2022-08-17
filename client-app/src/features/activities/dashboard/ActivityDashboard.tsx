@@ -1,16 +1,21 @@
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
 import { useStore } from '../../../app/stores/store';
 import { ActivityList } from './ActivityList';
-import { ActivityDetails } from './details/ActivityDetails';
-import { ActivityForm } from './form/ActivityForm';
+import { LoadingComponent } from '../../../app/layout/LoadingComponent';
 
 
 export const ActivityDashboard = observer (() => {
-
     const {activityStore} = useStore();
-    const {selectedActivity, editMode} = activityStore;
+    const {loadActivities, activityRegistry} = activityStore;
+
+    useEffect(() => {
+        if (activityRegistry.size <= 1) loadActivities();
+    }, [loadActivities, activityRegistry.size])
+  
+
+    if (activityStore.loadingInitial) return <LoadingComponent content='Loading App'/>
 
     return (
         <Grid>
@@ -18,10 +23,7 @@ export const ActivityDashboard = observer (() => {
                 <ActivityList />
             </Grid.Column>
             <Grid.Column width='6'>
-                {selectedActivity && !editMode &&
-                <ActivityDetails />}
-                {editMode &&
-                <ActivityForm />}
+                <h2>Activity filters</h2>
             </Grid.Column>
         </Grid>
     )
